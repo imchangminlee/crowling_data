@@ -47,7 +47,7 @@ def croling(data, count_dict, processnum):
     driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=option)
     while count_dict['count'] < len(keys):
         print(count_dict['count'])
-        idx= count*4+processnum
+        idx= count*8+processnum
         key = keys[idx]
         count += 1
         count_dict['count'] += 1
