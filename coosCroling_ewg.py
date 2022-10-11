@@ -47,7 +47,7 @@ def croling(data, count_dict, processnum):
     driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=option)
     while count_dict['count'] < len(keys):
         print(count_dict['count'])
-        idx= count*4+processnum
+        idx= count*1+processnum
         key = keys[idx]
         count += 1
         count_dict['count'] += 1
@@ -56,6 +56,7 @@ def croling(data, count_dict, processnum):
             #//*[@id="__next"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div/div[1]/i
             loading = driver.find_element("xpath", '//*[@id="__next"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div')
             search_box = driver.find_element('xpath', '//*[@id="__next"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div/div[1]/input')
+            #//*[@id="__next"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div/div[1]/input
             search_box.send_keys(key.lower())
             while (loading.get_attribute('class')!='ui active visible big focus fluid search'):
                 time.sleep(1)
@@ -79,6 +80,11 @@ def croling(data, count_dict, processnum):
                     url=driver.current_url
                     krName = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/div/div/div[2]/div[1]').text
                     enName = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/div/div/div[2]/div[2]').text
+                    info = driver.find_elements('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/table/tbody/tr[3]/td[2]/div/div')
+                    infos = []
+                    for i in info:
+                        infos.append(i.text)
+                    print(infos)
                     name = {'kr': krName, 'en': enName}
 
                     print(name)
@@ -117,7 +123,7 @@ if __name__ == '__main__':
     process = []
 
     # while count<len(keys):
-    for i in range(8):
+    for i in range(1):
         p = multiprocessing.Process(target = croling, args = (data, count_dict, i))
         process.append(p)
         p.start()
