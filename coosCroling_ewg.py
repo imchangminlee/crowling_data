@@ -47,7 +47,8 @@ def croling(data, count_dict, processnum):
     driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=option)
     while count_dict['count'] < len(keys):
         print(count_dict['count'])
-        idx= count*1+processnum
+
+        idx= count*8+processnum
         key = keys[idx]
         count += 1
         count_dict['count'] += 1
@@ -123,7 +124,7 @@ if __name__ == '__main__':
     process = []
 
     # while count<len(keys):
-    for i in range(1):
+    for i in range(8):
         p = multiprocessing.Process(target = croling, args = (data, count_dict, i))
         process.append(p)
         p.start()
