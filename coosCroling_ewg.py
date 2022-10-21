@@ -15,8 +15,8 @@ with open('kqcData.json', 'r', encoding='utf-8') as f:
 
 #keys = [key for key in json_data]
 #print("lenkey:", len(keys))
-name = pd.read_csv('new_name_merge.csv')
-name=(name.iloc[:,[0]]).values.tolist()
+name = pd.read_csv('COOS_Keyword.csv')
+name=(name.iloc[2:3,[1]]).values.tolist()
 keys = []
 for i in name:
     keys.append(i[0])
@@ -48,7 +48,7 @@ def croling(data, count_dict, processnum):
     while count_dict['count'] < len(keys):
         print(count_dict['count'])
 
-        idx= count*8+processnum
+        idx= count*1+processnum
         key = keys[idx]
         count += 1
         count_dict['count'] += 1
@@ -81,15 +81,16 @@ def croling(data, count_dict, processnum):
                     url=driver.current_url
                     krName = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/div/div/div[2]/div[1]').text
                     enName = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/div/div/div[2]/div[2]').text
-                    info = driver.find_elements('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/table/tbody/tr[3]/td[2]/div/div')
-                    infos = []
+                    info = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/table/tbody/tr[3]/td[2]/div/div[3]').text
+                    '''infos = []
                     for i in info:
-                        infos.append(i.text)
-                    print(infos)
+                        infos.append(i.text)'''
+                    info = info[1:]
+                    print(info)
                     name = {'kr': krName, 'en': enName}
 
                     print(name)
-                    data.append([idx, key])
+                    data.append([idx, key, krName, enName, info])
                     #ewg = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[2]/div[1]/p')
                     #ewg정보가 제공되는 지 확인하는 코드 
                     '''if(ewg.text=='SkinDeep 데이터가 제공되지 않는 성분입니다.'):
@@ -124,7 +125,7 @@ if __name__ == '__main__':
     process = []
 
     # while count<len(keys):
-    for i in range(8):
+    for i in range(1):
         p = multiprocessing.Process(target = croling, args = (data, count_dict, i))
         process.append(p)
         p.start()
@@ -134,7 +135,8 @@ if __name__ == '__main__':
     print(data)
     data=list(data)
     df = pd.DataFrame(data)
-    df.to_csv("coos_data.csv", header=None, index=None)
+    print(df)
+    df.to_csv("cooskeyword_data.csv", header=None, index=None, encoding='utf-8-sig')
     print(count_dict['count'], count_dict['errcount'])
     print(time.time()- start)
     
