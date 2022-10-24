@@ -129,16 +129,11 @@ def croling(data, count_dict, processnum):
                         ewg = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[2]/table[1]/tbody/tr[3]/td[2]/div/div')'''
                     count_dict['awscount'] += 1
                     break
-            if(flag==0):
-                count_dict['errcount'] += 1
-                #i_list[1]='err'
-                #data.append(i_list)
-                #print("err:", count_dict['errcount'])
         except:
         #if(0): 
             count_dict['errcount'] += 1
             #i_list[1]='err'
-            #data.append(i_list)
+            data.append([idx, key])
             #print("err:", count_dict['errcount'])
         print('aswcount:', count_dict['awscount'],'errcount: ', count_dict['errcount'])
     
@@ -166,7 +161,7 @@ if __name__ == '__main__':
     print(data)
     data=list(data)
     df = pd.DataFrame(data)
-    df.to_csv("ewg_data_test.csv", header=None, index=None)
+    df.to_csv("ewg_data_test1.csv", header=None, index=None)
     print(count_dict['count'], count_dict['errcount'])
     print(time.time()- start)
     

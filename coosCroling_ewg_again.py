@@ -9,17 +9,29 @@ import pandas as pd
 import multiprocessing
 import os
 from selenium.webdriver.common.by import By
-
-with open('kqcData.json', 'r', encoding='utf-8') as f:
-    json_data = json.load(f)
+import numpy as np
+import math
 
 #keys = [key for key in json_data]
 #print("lenkey:", len(keys))
 name = pd.read_csv('COOS_Keyword.csv')
-name=(name.iloc[:100,[1]]).values.tolist()
+nidx = pd.read_csv('cooskeyword.csv')
+org = (pd.read_csv('cooskeyword_data.csv')).iloc[:].values.tolist()
+name=(name.iloc[:,[1]]).values.tolist()
+print("name : ", name)
+nidx=(nidx.iloc[:,[1]]).values.tolist()
+print("nidx : ", nidx)
+idx_lst = []
+for i in range(len(nidx)):
+    if nidx[i] != name[i]:
+        idx_lst.append(i)
+print(idx_lst)
+print(len(idx_lst))
+
 keys = []
-for i in name:
-    keys.append(i[0])
+for j in idx_lst:
+    keys.append(name[j])
+keys = np.array(keys).flatten().tolist()
 print(keys)
 
 option = webdriver.ChromeOptions()
@@ -48,8 +60,11 @@ def croling(data, count_dict, processnum):
     while count_dict['count'] < len(keys):
         print(count_dict['count'])
 
-        idx= count*1+processnum
-        key = keys[idx]
+        id= count*1+processnum
+        idx = idx_lst[id]
+        print("idx", idx)
+        key = keys[id]
+        print("key", key)
         count += 1
         count_dict['count'] += 1
         driver.get(url=URL)
@@ -81,16 +96,6 @@ def croling(data, count_dict, processnum):
                     url=driver.current_url
                     krName = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/div/div/div[2]/div[1]').text
                     enName = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[1]/div/div/div[2]/div[2]').text
-                    ewg_lvl = ""
-                    ewg_dt = ""
-                    try:
-                        ewg_lvl = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[2]/table[1]/tbody/tr[1]/td[2]/div/div[2]/div/div').text
-                        ewg_dt = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[2]/table[1]/tbody/tr[2]/td[2]/div/p/strong[1]').text
-                        ewg_dt = ewg_dt.replace("[", "").replace("]", "")
-                    except:
-                        ewg_lvl = "None"
-                        ewg_dt = "None"
-
                     isitinfo1 = " "
                     isitinfo2 = " "
                     isitinfo3 = " "
@@ -109,13 +114,15 @@ def croling(data, count_dict, processnum):
                         info = isitinfo3
                     else:
                         info = isitinfo4
-
+                        
+                    '''infos = []
+                    for i in info:
+                        infos.append(i.text)'''
                     info = info[1:]
                     print(info)
                     name = {'kr': krName, 'en': enName}
-
                     print(name)
-                    data.append([idx, key, krName, enName, info, ewg_lvl, ewg_dt])
+                    data.append([idx, key, krName, enName, info])
                     #ewg = driver.find_element('xpath', '//*[@id="__next"]/div/div/main/div/div/div/div[1]/div[2]/div[1]/p')
                     #ewg정보가 제공되는 지 확인하는 코드 
                     '''if(ewg.text=='SkinDeep 데이터가 제공되지 않는 성분입니다.'):
@@ -128,11 +135,11 @@ def croling(data, count_dict, processnum):
                     break
             if(flag==0):
                 count_dict['errcount'] += 1
-                data.append([idx])
+                data.append([idx, key])
                 #print("err:", count_dict['errcount'])
         except: 
             count_dict['errcount'] += 1
-            data.append([idx])
+            data.append([idx, key])
             #print("err:", count_dict['errcount'])
         print('aswcount:', count_dict['awscount'],'errcount: ', count_dict['errcount'])
     
@@ -157,11 +164,13 @@ if __name__ == '__main__':
 
     for p in process:
         p.join()
-    print(data)
     data=list(data)
-    df = pd.DataFrame(data)
+    for i in range(len(data)):
+        if org[data[i][0]][0] == data[i][0]:
+            org[data[i][0]] = data[i]
+    df = pd.DataFrame(org)
     print(df)
-    df.to_csv("cooskeyword_data_test.csv", header=None, index=None, encoding='utf-8-sig')
+    df.to_csv("cooskeyword_data_again.csv", header=None, index=None, encoding='utf-8-sig')
     print(count_dict['count'], count_dict['errcount'])
     print(time.time()- start)
     
